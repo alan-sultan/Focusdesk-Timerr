@@ -97,3 +97,42 @@ export function MobileNav() {
     </nav>
   );
 }
+
+export function TopNav() {
+  const pathname = usePathname();
+  
+  return (
+    <nav className="flex justify-between items-center w-full px-8 h-16 sticky top-0 z-50 bg-[var(--background)] font-sans tracking-tight border-b border-[var(--border)]/5">
+      <div className="text-xl font-black tracking-[0.2em] text-[var(--primary)] uppercase">FOCUSDESK</div>
+      
+      <div className="hidden md:flex items-center space-x-10">
+        {NAV_ITEMS.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              'text-[10px] font-bold uppercase tracking-widest transition-all',
+              pathname === item.href
+                ? 'text-[var(--accent)] border-b-2 border-[var(--primary)] pb-1'
+                : 'text-[var(--on-surface-variant)] hover:text-[var(--foreground)]'
+            )}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+
+      <div className="flex items-center space-x-4">
+        <button type="button" className="p-2 rounded-full hover:bg-[var(--surface-container)] transition-all duration-300">
+          <div className="relative">
+            <Bell className="w-5 h-5 text-[var(--primary)]" />
+            <div className="absolute top-1 right-1 w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse" />
+          </div>
+        </button>
+        <button type="button" className="p-2 rounded-full hover:bg-[var(--surface-container)] transition-all duration-300">
+          <User className="w-6 h-6 text-[var(--primary)]" />
+        </button>
+      </div>
+    </nav>
+  );
+}
