@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #f8fafc;
+    --foreground: #1e293b;
+    --surface: #ffffff;
+    --surface-container: #f1f5f9;
+    --primary: #be0037;
+    --secondary: #29a195;
+    --accent: #40000c;
+    --border: #e2e8f0;
+    --on-surface-variant: #64748b;
+  }
+
+  .theme-midnight {
+    --background: #0b1326;
+    --foreground: #dae2fd;
+    --surface: #131b2e;
+    --surface-container: #222a3d;
+    --primary: #e11d48;
+    --secondary: #6bd8cb;
+    --accent: #ffb3b6;
+    --border: #2d3449;
+    --on-surface-variant: #e5bdbe;
+  }
+
+  .theme-sol {
+    --background: #f8fafc;
+    --foreground: #1e293b;
+    --surface: #ffffff;
+    --surface-container: #f1f5f9;
+    --primary: #be0037;
+    --secondary: #29a195;
+    --accent: #40000c;
+    --border: #e2e8f0;
+    --on-surface-variant: #64748b;
+  }
+
+  .theme-serene {
+    --background: #002019;
+    --foreground: #eefff7;
+    --surface: #00382d;
+    --surface-container: #005142;
+    --primary: #74d8bd;
+    --secondary: #90f5d9;
+    --accent: #89f5e7;
+    --border: #00836c;
+    --on-surface-variant: #74d8bd;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Inter', sans-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--surface-container);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border);
+  }
+}
+
+.radial-gradient-bg {
+  background: radial-gradient(circle at 50% 50%, var(--surface) 0%, var(--background) 100%);
+}
+
+.timer-display {
+  font-size: 14rem;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  font-weight: 900;
+}
+
+@layer components {
+  .page-main {
+    padding: clamp(1rem, 2.5vw, 2.25rem);
+  }
+
+  .with-mobile-nav {
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+  }
+
+  .dashboard-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+  }
+
+  .type-overline {
+    font-size: 0.7rem;
+    line-height: 1.2;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--on-surface-variant);
+  }
+
+  .type-title {
+    font-size: clamp(1.625rem, 3vw, 2.125rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 900;
+    color: var(--foreground);
+    text-transform: uppercase;
+  }
+
+  .type-subtitle {
+    margin-top: 0.4rem;
+    font-size: 0.73rem;
+    line-height: 1.5;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--on-surface-variant);
+  }
+
+  .type-card-title {
+    font-size: 0.72rem;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--on-surface-variant);
+  }
+
+  .type-label {
+    font-size: 0.68rem;
+    line-height: 1.35;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 800;
+  }
+
+  .type-caption {
+    font-size: 0.72rem;
+    line-height: 1.45;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--on-surface-variant);
+  }
+
+  .mobile-nav-shell {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    min-height: 4.25rem;
+    padding: 0.35rem;
+    border-radius: 1rem;
+  }
+
+  .mobile-nav-link {
+    min-width: 3rem;
+    min-height: 3rem;
+    border-radius: 0.8rem;
+    gap: 0.15rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .touch-target {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .dashboard-card {
+    padding: 1.5rem;
+  }
+
+  .mobile-nav-shell {
+    left: 1.25rem;
+    right: 1.25rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 1024px) {
+  .with-mobile-nav {
+    padding-bottom: 2rem;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .timer-display {
+    font-size: 6rem;
+  }
+}
