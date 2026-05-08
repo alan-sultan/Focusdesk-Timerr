@@ -14,10 +14,15 @@ import {
   CheckCircle2,
   Target,
   Brain,
+  Volume2,
+  VolumeX,
+  Music2,
+  Mic,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTimer } from '@/lib/timer-context';
 import { ActionModal } from '@/components/action-modal';
+import { CurrentDateTime } from '@/components/current-date-time';
 
 function formatTime(seconds: number) {
   const m = Math.floor(seconds / 60);
@@ -35,10 +40,15 @@ export default function FocusModePage() {
     progress,
     currentTask,
     sessionsCompleted,
+    settings,
+    timerStatus,
+    ambientState,
+    voiceStatus,
     isMounted,
     setIsActive,
     resetTimer,
     skipSession,
+    setCurrentTask,
   } = useTimer();
 
   useEffect(() => {
@@ -59,9 +69,7 @@ export default function FocusModePage() {
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((e) => {
-        console.error(`Error attempting to enable fullscreen mode: ${e.message}`);
-      });
+      document.documentElement.requestFullscreen().catch(() => undefined);
       return;
     }
 
@@ -98,6 +106,7 @@ export default function FocusModePage() {
             <button
               type="button"
               onClick={toggleFullscreen}
+              aria-label={isFullscreen ? 'Exit fullscreen focus view' : 'Enter fullscreen focus view'}
               className="touch-target group flex items-center justify-center rounded-xl bg-[var(--surface-container)] border border-[var(--border)] transition-all duration-300 hover:border-[var(--accent)] hover:shadow-lg hover:shadow-[var(--accent)]/10"
               title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
             >
@@ -108,16 +117,14 @@ export default function FocusModePage() {
               )}
             </button>
 
-            <Link href="/">
-              <button
-                type="button"
-                className="touch-target group flex items-center space-x-2.5 px-4 rounded-xl bg-[var(--surface-container)] border border-[var(--border)] transition-all duration-300 hover:border-[var(--primary)] hover:shadow-lg hover:shadow-[var(--primary)]/10"
-              >
-                <span className="text-[var(--foreground)] group-hover:text-[var(--primary)] text-[0.65rem] font-black tracking-[0.18em] uppercase">
-                  Dashboard
-                </span>
-                <X className="w-4 h-4 text-[var(--on-surface-variant)] group-hover:text-[var(--primary)]" />
-              </button>
+            <Link
+              href="/"
+              className="touch-target group flex items-center space-x-2.5 px-4 rounded-xl bg-[var(--surface-container)] border border-[var(--border)] transition-all duration-300 hover:border-[var(--primary)] hover:shadow-lg hover:shadow-[var(--primary)]/10"
+            >
+              <span className="text-[var(--foreground)] group-hover:text-[var(--primary)] text-[0.65rem] font-black tracking-[0.18em] uppercase">
+                Dashboard
+              </span>
+              <X className="w-4 h-4 text-[var(--on-surface-variant)] group-hover:text-[var(--primary)]" />
             </Link>
           </div>
         </header>
@@ -126,12 +133,18 @@ export default function FocusModePage() {
           <div className="bg-[var(--surface)]/90 backdrop-blur-xl rounded-3xl border border-[var(--border)] p-6 md:p-8 flex flex-col">
             <div className="flex items-center justify-between gap-4 mb-6">
               <div>
-                <p className="type-label tracking-[0.2em] text-[var(--on-surface-variant)]">Current Task</p>
-                <p className="text-lg md:text-2xl font-bold text-[var(--foreground)] mt-1 truncate max-w-[45ch]">{currentTask || 'No task set yet'}</p>
+                <label htmlFor="focus-current-task" className="type-label tracking-[0.2em] text-[var(--on-surface-variant)]">Current Task</label>
+                <input
+                  id="focus-current-task"
+                  value={currentTask}
+                  onChange={(event) => setCurrentTask(event.target.value)}
+                  className="mt-1 w-full max-w-[45ch] rounded-lg border border-transparent bg-transparent px-1 text-lg md:text-2xl font-bold text-[var(--foreground)] placeholder:text-[var(--on-surface-variant)] focus:border-[var(--secondary)]"
+                  placeholder="What are you working on?"
+                />
               </div>
 
               <div className="type-label px-3 py-1.5 rounded-full bg-[var(--surface-container)] border border-[var(--border)] tracking-[0.15em] text-[var(--accent)]">
-                {mode === 'focus' ? 'Focus' : mode === 'shortBreak' ? 'Short Break' : 'Long Break'}
+                {mode === 'focus' ? 'Focus' : mode === 'shortBreak' ? 'Short Break' : 'Long Break'} - {timerStatus}
               </div>
             </div>
 
@@ -157,6 +170,7 @@ export default function FocusModePage() {
                 <button
                   type="button"
                   onClick={() => setShowResetModal(true)}
+                  aria-label="Reset focus timer"
                   className="flex flex-col items-center group space-y-2"
                 >
                   <div className="w-12 h-12 rounded-full border border-[var(--border)] flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--surface-container)] group-hover:border-[var(--accent)]/50">
@@ -168,12 +182,13 @@ export default function FocusModePage() {
                 <button
                   type="button"
                   onClick={() => setIsActive(!isActive)}
+                  aria-label={isActive ? 'Pause focus timer' : 'Start focus timer'}
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] flex items-center justify-center shadow-[0_20px_38px_rgba(225,29,72,0.35)] hover:scale-105 transition-transform duration-300"
                 >
                   {isActive ? <Pause className="w-9 h-9 text-[#68001a] fill-current" /> : <Play className="w-9 h-9 text-[#68001a] fill-current" />}
                 </button>
 
-                <button type="button" onClick={skipSession} className="flex flex-col items-center group space-y-2">
+                <button type="button" onClick={skipSession} aria-label="Skip to the next timer mode" className="flex flex-col items-center group space-y-2">
                   <div className="w-12 h-12 rounded-full border border-[var(--border)] flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--surface-container)] group-hover:border-[var(--accent)]/50">
                     <SkipForward className="w-4 h-4 text-[var(--on-surface-variant)] group-hover:text-[var(--accent)]" />
                   </div>
@@ -185,6 +200,10 @@ export default function FocusModePage() {
 
           <aside className="bg-[var(--surface)]/90 backdrop-blur-xl rounded-3xl border border-[var(--border)] p-5 md:p-6 space-y-4">
             <h2 className="type-label tracking-[0.2em] text-[var(--on-surface-variant)]">Session Details</h2>
+
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-container)] p-4">
+              <CurrentDateTime compact />
+            </div>
 
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-container)] p-4">
               <div className="type-label flex items-center justify-between text-[var(--on-surface-variant)] tracking-[0.12em]">
@@ -208,6 +227,22 @@ export default function FocusModePage() {
                 <Target className="w-4 h-4 text-[var(--accent)]" />
               </div>
               <p className="mt-2 text-sm font-bold text-[var(--foreground)]">{isActive ? 'In progress - keep momentum' : 'Paused - ready when you are'}</p>
+            </div>
+
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-container)] p-4 space-y-3">
+              <div className="type-label flex items-center justify-between text-[var(--on-surface-variant)] tracking-[0.12em]">
+                <span>Feedback</span>
+                {settings.timerSoundsEnabled ? <Volume2 className="w-4 h-4 text-[var(--secondary)]" /> : <VolumeX className="w-4 h-4" />}
+              </div>
+              <p className="text-sm font-bold text-[var(--foreground)]">{settings.timerSoundsEnabled ? 'Timer sounds enabled' : 'Timer sounds disabled'}</p>
+              <div className="flex items-center gap-2 text-xs font-bold text-[var(--on-surface-variant)]">
+                <Music2 className="h-4 w-4" />
+                <span>Ambient {ambientState === 'playing' ? 'playing' : settings.ambientEnabled ? 'ready' : 'off'}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-bold text-[var(--on-surface-variant)]">
+                <Mic className="h-4 w-4" />
+                <span>Voice {voiceStatus === 'listening' ? 'listening' : settings.voiceCommandsEnabled ? voiceStatus : 'off'}</span>
+              </div>
             </div>
 
             <div className="rounded-2xl border border-[var(--border)] bg-gradient-to-br from-[var(--surface-container)] to-[var(--surface)] p-4">

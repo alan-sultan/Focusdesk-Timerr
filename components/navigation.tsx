@@ -3,9 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Timer, BarChart2, History, Settings, User, Bell, Target } from 'lucide-react';
+import { Timer, BarChart2, History, Settings, User, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTimer } from '@/lib/timer-context';
+import { CurrentDateTime } from '@/components/current-date-time';
 
 const NAV_ITEMS = [
   { label: 'Timer', icon: Timer, href: '/' },
@@ -24,6 +25,9 @@ export function Sidebar() {
       <div className="mb-10">
         <h1 className="text-xl font-black tracking-widest text-[var(--primary)] uppercase">FOCUSDESK</h1>
         <p className="text-[10px] text-[var(--on-surface-variant)] uppercase tracking-widest mt-1">Focus Timer</p>
+        <div className="mt-5 rounded-xl border border-[var(--border)] bg-[var(--surface-container)] p-3">
+          <CurrentDateTime compact />
+        </div>
       </div>
 
       <nav className="flex-1 space-y-2">
@@ -33,6 +37,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActivePath ? 'page' : undefined}
               className={cn(
                 'flex items-center space-x-3 px-4 py-3 rounded-lg transition-all',
                 isActivePath
@@ -60,6 +65,7 @@ export function Sidebar() {
           </div>
           <button
             type="button"
+            aria-label={isActive ? 'Pause current focus timer' : 'Start current focus timer'}
             onClick={() => setIsActive(!isActive)}
             className="w-full py-2 bg-[var(--primary)] text-white text-[10px] font-bold rounded-md uppercase tracking-widest hover:opacity-90 transition-colors"
           >
@@ -82,6 +88,8 @@ export function MobileNav() {
           <Link
             key={item.href}
             href={item.href}
+            aria-current={isActivePath ? 'page' : undefined}
+            aria-label={`Open ${item.label}`}
             className={cn(
               'mobile-nav-link flex flex-col items-center justify-center transition-all touch-target',
               isActivePath ? 'text-[var(--primary)] bg-[var(--surface-container)]' : 'text-[var(--on-surface-variant)]'
@@ -122,17 +130,7 @@ export function TopNav() {
         ))}
       </div>
 
-      <div className="flex items-center space-x-4">
-        <button type="button" className="p-2 rounded-full hover:bg-[var(--surface-container)] transition-all duration-300">
-          <div className="relative">
-            <Bell className="w-5 h-5 text-[var(--primary)]" />
-            <div className="absolute top-1 right-1 w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse" />
-          </div>
-        </button>
-        <button type="button" className="p-2 rounded-full hover:bg-[var(--surface-container)] transition-all duration-300">
-          <User className="w-6 h-6 text-[var(--primary)]" />
-        </button>
-      </div>
+      <CurrentDateTime compact />
     </nav>
   );
 }

@@ -9,16 +9,18 @@ import {
   RotateCcw,
   SkipForward,
   Timer as TimerIcon,
-  Flame,
-  Zap,
-  TrendingUp,
   FileText,
-  MoreHorizontal,
   Target,
+  Volume2,
+  VolumeX,
+  Music2,
+  Mic,
+  Activity,
 } from 'lucide-react';
 import { useTimer } from '@/lib/timer-context';
 import { Sidebar, MobileNav } from '@/components/navigation';
 import { ActionModal } from '@/components/action-modal';
+import { CurrentDateTime } from '@/components/current-date-time';
 import { cn } from '@/lib/utils';
 
 function formatTime(seconds: number) {
@@ -33,6 +35,21 @@ const MODES = [
   { id: 'longBreak', label: 'Long Break' },
 ] as const;
 
+function getModeLabel(mode: typeof MODES[number]['id']) {
+  return MODES.find((item) => item.id === mode)?.label || 'Focus';
+}
+
+function getTimerStatusLabel(status: 'idle' | 'running' | 'paused') {
+  switch (status) {
+    case 'running':
+      return 'Running';
+    case 'paused':
+      return 'Paused';
+    default:
+      return 'Idle';
+  }
+}
+
 export default function TimerPage() {
   const [showResetModal, setShowResetModal] = useState(false);
   const {
@@ -42,6 +59,10 @@ export default function TimerPage() {
     progress,
     sessionsCompleted,
     currentTask,
+    settings,
+    timerStatus,
+    ambientState,
+    voiceStatus,
     isMounted,
     setMode,
     setIsActive,
@@ -66,6 +87,7 @@ export default function TimerPage() {
                 key={m.id}
                 type="button"
                 onClick={() => setMode(m.id)}
+                aria-pressed={mode === m.id}
                 className={cn(
                   'px-4 py-1.5 rounded-full text-[10px] font-bold uppercase transition-all',
                   mode === m.id
@@ -109,7 +131,7 @@ export default function TimerPage() {
                 key={timeLeft}
                 initial={{ opacity: 0.8 }}
                 animate={{ opacity: 1 }}
-                className="text-7xl font-black text-[var(--foreground)] tracking-tighter"
+                className="text-7xl font-black text-[var(--foreground)] tracking-normal"
               >
                 {isMounted ? formatTime(timeLeft) : '--:--'}
               </motion.span>
@@ -122,6 +144,7 @@ export default function TimerPage() {
           <div className="mt-10 flex space-x-6 z-10">
             <button
               type="button"
+              aria-label="Reset timer"
               onClick={() => setShowResetModal(true)}
               className="w-12 h-12 rounded-full border border-[var(--border)] flex items-center justify-center text-[var(--on-surface-variant)] hover:text-[var(--foreground)] transition-all hover:bg-[var(--border)]"
             >
@@ -130,6 +153,7 @@ export default function TimerPage() {
 
             <button
               type="button"
+              aria-label={isActive ? 'Pause timer' : 'Start timer'}
               onClick={() => setIsActive(!isActive)}
               className="h-12 px-10 rounded-full bg-[var(--primary)] text-white flex items-center space-x-3 shadow-[0_10px_20px_rgba(225,29,72,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
@@ -139,6 +163,7 @@ export default function TimerPage() {
 
             <button
               type="button"
+              aria-label="Skip to the next timer mode"
               onClick={skipSession}
               className="w-12 h-12 rounded-full border border-[var(--border)] flex items-center justify-center text-[var(--on-surface-variant)] hover:text-[var(--foreground)] transition-all hover:bg-[var(--border)]"
             >
@@ -149,38 +174,50 @@ export default function TimerPage() {
 
         <div className="dashboard-card flex flex-col justify-between">
           <div className="flex justify-between items-start">
-            <span className="text-[10px] font-bold text-[var(--secondary)] uppercase tracking-widest">Daily Streak</span>
+            <span className="text-[10px] font-bold text-[var(--secondary)] uppercase tracking-widest">Today</span>
             <div className="bg-[var(--secondary)]/10 p-2 rounded-lg">
-              <Flame className="w-4 h-4 text-[var(--secondary)]" />
+              <Activity className="w-4 h-4 text-[var(--secondary)]" />
             </div>
           </div>
-          <div>
-            <p className="text-4xl font-black text-[var(--foreground)]">{isMounted ? '12' : '0'}</p>
-            <p className="text-[10px] text-[var(--on-surface-variant)] uppercase tracking-widest mt-1">Consecutive Days</p>
+          <div className="mt-8">
+            <CurrentDateTime />
           </div>
-          <div className="flex space-x-1.5 mt-4">
-            <div className="w-full h-1.5 bg-[var(--secondary)] rounded-full shadow-[0_0_8px_rgba(107,216,203,0.3)]" />
-            <div className="w-full h-1.5 bg-[var(--secondary)] rounded-full shadow-[0_0_8px_rgba(107,216,203,0.3)]" />
-            <div className="w-full h-1.5 bg-[var(--secondary)] rounded-full shadow-[0_0_8px_rgba(107,216,203,0.3)]" />
-            <div className="w-full h-1.5 bg-[var(--border)] rounded-full" />
-            <div className="w-full h-1.5 bg-[var(--border)] rounded-full" />
+          <div className="mt-6">
+            <p className="text-[10px] text-[var(--on-surface-variant)] uppercase tracking-widest">Focus sessions completed</p>
+            <p className="text-sm font-bold text-[var(--foreground)] mt-1">{isMounted ? sessionsCompleted : 0} today</p>
           </div>
         </div>
 
         <div className="dashboard-card flex flex-col justify-between">
           <div className="flex justify-between items-start">
-            <span className="text-[10px] font-bold text-[var(--accent)] uppercase tracking-widest">Efficiency</span>
+            <span className="text-[10px] font-bold text-[var(--accent)] uppercase tracking-widest">System Status</span>
             <div className="bg-[var(--accent)]/10 p-2 rounded-lg">
-              <Zap className="w-4 h-4 text-[var(--accent)]" />
+              {settings.timerSoundsEnabled ? (
+                <Volume2 className="w-4 h-4 text-[var(--accent)]" />
+              ) : (
+                <VolumeX className="w-4 h-4 text-[var(--accent)]" />
+              )}
             </div>
           </div>
-          <div>
-            <p className="text-4xl font-black text-[var(--foreground)]">{isMounted ? '94%' : '--%'}</p>
-            <p className="text-[10px] text-[var(--on-surface-variant)] uppercase tracking-widest mt-1">Focus Score</p>
-          </div>
-          <div className="mt-4 flex items-center space-x-2 text-[10px] text-[var(--secondary)] font-bold">
-            <TrendingUp className="w-3 h-3" />
-            <span>+4% vs Yesterday</span>
+          <div className="mt-8 space-y-4">
+            <div>
+              <p className="text-[10px] text-[var(--on-surface-variant)] uppercase tracking-widest">Timer</p>
+              <p className="text-lg font-black text-[var(--foreground)]">{getModeLabel(mode)} - {getTimerStatusLabel(timerStatus)}</p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 text-[0.72rem] font-bold text-[var(--foreground)]">
+              <div className="flex items-center gap-2">
+                {settings.timerSoundsEnabled ? <Volume2 className="h-4 w-4 text-[var(--secondary)]" /> : <VolumeX className="h-4 w-4 text-[var(--on-surface-variant)]" />}
+                <span>{settings.timerSoundsEnabled ? 'Timer sounds on' : 'Timer sounds off'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Music2 className={cn('h-4 w-4', ambientState === 'playing' ? 'text-[var(--secondary)]' : 'text-[var(--on-surface-variant)]')} />
+                <span>Ambient {ambientState === 'playing' ? 'playing' : settings.ambientEnabled ? 'ready' : 'off'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mic className={cn('h-4 w-4', voiceStatus === 'listening' ? 'text-[var(--secondary)]' : 'text-[var(--on-surface-variant)]')} />
+                <span>Voice {voiceStatus === 'listening' ? 'listening' : settings.voiceCommandsEnabled ? voiceStatus : 'off'}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -192,9 +229,11 @@ export default function TimerPage() {
                 <FileText className="w-5 h-5" />
               </div>
               <input
+                id="current-task"
                 value={currentTask}
                 onChange={(e) => setCurrentTask(e.target.value)}
-                className="bg-transparent border-none focus:ring-0 text-xl font-bold text-[var(--foreground)] w-full placeholder:text-[var(--on-surface-variant)] outline-none"
+                aria-label="Current task"
+                className="bg-transparent border-none focus:ring-0 text-xl font-bold text-[var(--foreground)] w-full placeholder:text-[var(--on-surface-variant)] outline-none rounded-md"
                 placeholder="What are you working on?"
               />
             </div>
@@ -214,12 +253,6 @@ export default function TimerPage() {
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            className="hidden md:flex ml-10 w-12 h-12 rounded-2xl bg-[var(--surface-container)] border border-[var(--border)] items-center justify-center text-[var(--foreground)] hover:bg-[var(--primary)] hover:text-white transition-all"
-          >
-            <MoreHorizontal className="w-5 h-5" />
-          </button>
         </div>
 
         <MobileNav />

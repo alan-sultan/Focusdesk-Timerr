@@ -2,15 +2,15 @@
 
 @layer base {
   :root {
-    --background: #f8fafc;
-    --foreground: #1e293b;
-    --surface: #ffffff;
-    --surface-container: #f1f5f9;
-    --primary: #be0037;
-    --secondary: #29a195;
-    --accent: #40000c;
-    --border: #e2e8f0;
-    --on-surface-variant: #64748b;
+    --background: #0b1326;
+    --foreground: #dae2fd;
+    --surface: #131b2e;
+    --surface-container: #222a3d;
+    --primary: #e11d48;
+    --secondary: #6bd8cb;
+    --accent: #ffb3b6;
+    --border: #2d3449;
+    --on-surface-variant: #e5bdbe;
   }
 
   .theme-midnight {
@@ -37,23 +37,31 @@
     --on-surface-variant: #64748b;
   }
 
-  .theme-serene {
-    --background: #002019;
-    --foreground: #eefff7;
-    --surface: #00382d;
-    --surface-container: #005142;
-    --primary: #74d8bd;
-    --secondary: #90f5d9;
-    --accent: #89f5e7;
-    --border: #00836c;
-    --on-surface-variant: #74d8bd;
+  .theme-colorBlind {
+    --background: #070b16;
+    --foreground: #f8fafc;
+    --surface: #111827;
+    --surface-container: #1f2937;
+    --primary: #60a5fa;
+    --secondary: #fbbf24;
+    --accent: #c4b5fd;
+    --border: #64748b;
+    --on-surface-variant: #d1d5db;
   }
-
   body {
     background-color: var(--background);
     color: var(--foreground);
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: 'Inter', sans-serif;
+  }
+
+  :where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 3px solid var(--secondary);
+    outline-offset: 3px;
+  }
+
+  :where(button, input, select) {
+    font: inherit;
   }
 
   ::-webkit-scrollbar {
@@ -79,7 +87,7 @@
 .timer-display {
   font-size: 14rem;
   line-height: 1;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
   font-weight: 900;
 }
 
@@ -112,7 +120,7 @@
   .type-title {
     font-size: clamp(1.625rem, 3vw, 2.125rem);
     line-height: 1.12;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     font-weight: 900;
     color: var(--foreground);
     text-transform: uppercase;

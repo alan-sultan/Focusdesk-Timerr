@@ -1,40 +1,40 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Sidebar, MobileNav } from '@/components/navigation';
 import { Zap, XCircle, Clock, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useTimer } from '@/lib/timer-context';
+import { useTimer, type HistoryItem, type TimerMode } from '@/lib/timer-context';
 import { ActionModal } from '@/components/action-modal';
+import { loadHistory } from '@/lib/storage';
 
-interface HistoryItem {
-  id: number;
-  task: string;
-  duration: number;
-  timestamp: string;
-  status: 'Success' | 'Aborted';
+function getModeLabel(mode: TimerMode) {
+  switch (mode) {
+    case 'shortBreak':
+      return 'Short Break';
+    case 'longBreak':
+      return 'Long Break';
+    default:
+      return 'Focus';
+  }
 }
 
 export default function HistoryPage() {
   const [showClearModal, setShowClearModal] = useState(false);
-  const [history, setHistory] = useState<HistoryItem[]>(() => {
-    if (typeof window === 'undefined') {
-      return [];
-    }
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const { isMounted, clearSessionHistory } = useTimer();
 
-    const saved = localStorage.getItem('chronos-history');
-    if (!saved) {
-      return [];
+  useEffect(() => {
+    if (isMounted) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHistory(loadHistory());
     }
-
-    return JSON.parse(saved) as HistoryItem[];
-  });
-  const { isMounted } = useTimer();
+  }, [isMounted]);
 
   const clearHistory = () => {
-    localStorage.removeItem('chronos-history');
+    clearSessionHistory();
     setHistory([]);
     setShowClearModal(false);
   };
@@ -53,15 +53,16 @@ export default function HistoryPage() {
       <Sidebar />
 
       <main className="page-main with-mobile-nav flex-1 lg:ml-64 flex flex-col relative">
-        <header className="flex justify-between items-end mb-16">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-end gap-5 mb-16">
           <div>
             <h2 className="type-title">Session History</h2>
-            <p className="type-subtitle">Review your completed focus sessions</p>
+            <p className="type-subtitle">Review completed and interrupted sessions</p>
           </div>
           <button
             type="button"
+            disabled={history.length === 0}
             onClick={() => setShowClearModal(true)}
-            className="px-6 py-2 rounded-xl bg-[var(--surface-container)] text-[var(--on-surface-variant)] text-[0.7rem] font-bold uppercase tracking-widest hover:text-[var(--foreground)] transition-all border border-[var(--border)]"
+            className="px-6 py-2 rounded-xl bg-[var(--surface-container)] text-[var(--on-surface-variant)] text-[0.7rem] font-bold uppercase tracking-widest hover:text-[var(--foreground)] transition-all border border-[var(--border)] disabled:cursor-not-allowed disabled:opacity-45"
           >
             Clear History
           </button>
@@ -70,17 +71,17 @@ export default function HistoryPage() {
         <section className="space-y-4">
           {history.length > 0 ? (
             history.map((item) => (
-              <div key={item.id} className="dashboard-card grid grid-cols-12 items-center transition-all cursor-pointer group hover:bg-[var(--surface-container)]">
+              <div key={item.id} className="dashboard-card grid grid-cols-12 items-center gap-y-4 transition-all group hover:bg-[var(--surface-container)]">
                 <div className="col-span-1 flex justify-center">
-                  {item.status === 'Success' ? (
+                  {item.status === 'completed' ? (
                     <Zap className="w-5 h-5 text-[var(--primary)] opacity-50 group-hover:opacity-100 transition-opacity" />
                   ) : (
                     <XCircle className="w-5 h-5 text-[var(--on-surface-variant)]" />
                   )}
                 </div>
                 <div className="col-span-11 md:col-span-4">
-                  <p className="text-[0.75rem] font-bold text-[var(--foreground)] uppercase tracking-wide truncate">{item.task || 'Unnamed Session'}</p>
-                  <p className="text-[0.65rem] text-[var(--on-surface-variant)] uppercase tracking-widest mt-1">Completed Session</p>
+                  <p className="text-[0.75rem] font-bold text-[var(--foreground)] uppercase tracking-wide truncate">{item.task}</p>
+                  <p className="text-[0.65rem] text-[var(--on-surface-variant)] uppercase tracking-widest mt-1">{getModeLabel(item.mode)} Session</p>
                 </div>
                 <div className="hidden md:flex col-span-3 justify-center items-center space-x-2">
                   <Clock className="w-4 h-4 text-[var(--on-surface-variant)]" />
@@ -90,7 +91,7 @@ export default function HistoryPage() {
                   <span
                     className={cn(
                       'text-[0.65rem] font-black border px-3 py-1 rounded-full uppercase tracking-widest',
-                      item.status === 'Success'
+                      item.status === 'completed'
                         ? 'text-[var(--secondary)] border-[var(--secondary)]/30'
                         : 'text-[var(--primary)] border-[var(--primary)]/30'
                     )}

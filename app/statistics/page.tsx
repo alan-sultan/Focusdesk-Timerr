@@ -3,7 +3,7 @@
 import React from 'react';
 import { Sidebar, MobileNav } from '@/components/navigation';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Clock, CheckCircle2, Flame, Lightbulb, ShieldCheck, TrendingUp, Bell, User, Zap, XCircle } from 'lucide-react';
+import { Clock, CheckCircle2, Flame, Lightbulb, ShieldCheck, TrendingUp, Zap, XCircle } from 'lucide-react';
 import { useTimer } from '@/lib/timer-context';
 import { cn } from '@/lib/utils';
 
@@ -64,18 +64,10 @@ export default function StatisticsPage() {
       <Sidebar />
 
       <main className="page-main with-mobile-nav flex-1 lg:ml-64 flex flex-col relative">
-        <header className="flex justify-between items-center mb-16">
+        <header className="mb-16">
           <div>
             <h2 className="type-title">Performance</h2>
             <p className="type-subtitle">Analytics and Historical Data</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button type="button" className="w-10 h-10 rounded-full flex items-center justify-center text-[var(--on-surface-variant)] hover:bg-[var(--surface-container)] hover:text-[var(--foreground)] transition-all">
-              <Bell className="w-5 h-5" />
-            </button>
-            <button type="button" className="w-10 h-10 rounded-full flex items-center justify-center text-[var(--on-surface-variant)] hover:bg-[var(--surface-container)] hover:text-[var(--foreground)] transition-all">
-              <User className="w-5 h-5" />
-            </button>
           </div>
         </header>
 
@@ -86,7 +78,7 @@ export default function StatisticsPage() {
             </div>
             <span className="text-[0.65rem] font-black text-[var(--on-surface-variant)] tracking-[0.3em] uppercase mb-4 block">Total focus time</span>
             <div className="flex items-baseline space-x-2">
-              <span className="text-5xl font-black text-[var(--foreground)] tracking-tighter">
+              <span className="text-5xl font-black text-[var(--foreground)] tracking-normal">
                 24<span className="text-[var(--primary)] text-2xl font-medium">h</span> 15
                 <span className="text-[var(--primary)] text-2xl font-medium">m</span>
               </span>
@@ -103,7 +95,7 @@ export default function StatisticsPage() {
             </div>
             <span className="text-[0.65rem] font-black text-[var(--on-surface-variant)] tracking-[0.3em] uppercase mb-4 block">Sessions completed</span>
             <div className="flex items-baseline space-x-2">
-              <span className="text-5xl font-black text-[var(--foreground)] tracking-tighter">42</span>
+              <span className="text-5xl font-black text-[var(--foreground)] tracking-normal">42</span>
               <span className="text-[var(--surface-container)] font-black text-lg">/ 50 Goal</span>
             </div>
             <div className="mt-6 h-1 w-full bg-[var(--surface-container)] rounded-full overflow-hidden">
@@ -117,7 +109,7 @@ export default function StatisticsPage() {
             </div>
             <span className="text-[0.65rem] font-black text-[var(--on-surface-variant)] tracking-[0.3em] uppercase mb-4 block">Daily streak</span>
             <div className="flex items-baseline space-x-2">
-              <span className="text-5xl font-black text-[var(--foreground)] tracking-tighter">5</span>
+              <span className="text-5xl font-black text-[var(--foreground)] tracking-normal">5</span>
               <span className="text-[var(--on-surface-variant)] font-black text-lg uppercase tracking-widest">Days</span>
             </div>
             <div className="mt-6 flex space-x-2">
@@ -150,7 +142,7 @@ export default function StatisticsPage() {
                   <span className="text-[0.6rem] text-[var(--on-surface-variant)] uppercase tracking-widest block text-center">{day}</span>
                   <div className="grid grid-rows-4 gap-2">
                     {HEATMAP_DATA[dIdx].map((val, vIdx) => (
-                      <div key={`${dIdx}-${vIdx}`} className={cn('h-10 rounded-lg transition-all hover:scale-105 cursor-pointer', getHeatmapColor(val))} />
+                      <div key={`${dIdx}-${vIdx}`} className={cn('h-10 rounded-lg transition-all', getHeatmapColor(val))} />
                     ))}
                   </div>
                 </div>
@@ -189,7 +181,7 @@ export default function StatisticsPage() {
                       <Cell
                         key={`cell-${index}`}
                         fill={entry.day === 'Today' ? 'var(--primary)' : 'var(--surface-container)'}
-                        className="hover:fill-[var(--primary)] transition-all cursor-pointer"
+                        className="hover:fill-[var(--primary)] transition-all"
                       />
                     ))}
                   </Bar>
@@ -240,7 +232,7 @@ export default function StatisticsPage() {
           <h3 className="text-[0.75rem] font-black text-[var(--foreground)] tracking-[0.3em] uppercase mb-8">Recent Sessions</h3>
           <div className="space-y-3">
             {RECENT_SESSIONS.map((session) => (
-              <div key={session.id} className="dashboard-card grid grid-cols-12 items-center transition-all cursor-pointer group hover:bg-[var(--surface-container)]">
+              <div key={session.id} className="dashboard-card grid grid-cols-12 items-center transition-all group hover:bg-[var(--surface-container)]">
                 <div className="col-span-1 flex justify-center">
                   {session.status === 'Success' ? (
                     <Zap className="w-5 h-5 text-[var(--primary)] opacity-50 group-hover:opacity-100 transition-opacity" />
